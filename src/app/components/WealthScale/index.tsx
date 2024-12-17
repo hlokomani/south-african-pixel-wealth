@@ -56,59 +56,49 @@ export const WealthScale = () => {
                 backgroundColor: COLORS.green
               }}
             >
-              {item.amount === 8500000 && (
-                <div className="absolute top-0 left-0 w-full">
-                  <div className="absolute -top-16 left-0 bg-white p-2 rounded shadow-sm">
-                    <p className="text-sm text-gray-600">Scale: Each mark = R1 million</p>
-                  </div>
-                  
-                  {[...Array(8)].map((_, i) => (
-                    <div key={i} className="absolute top-0 flex flex-col items-center"
-                         style={{ left: `${(i + 1) * (1000000 / RANDS_PER_PIXEL)}px` }}>
-                      <div className="h-4 w-0.5 bg-gray-400" />
-                      <span className="text-xs text-gray-500 mt-1">
-                        {i + 1}M
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              
               {item.amount >= 1000000 && (
                 <div className="absolute bottom-0 left-0 w-full">
-                  {/* First million indicator arrow */}
-                  {item.amount === 8500000 && (
-                    <div className="absolute bottom-20 left-0" style={{ width: `${1000000 / RANDS_PER_PIXEL}px` }}>
-                      <div className="relative w-full">
-                        <p className="absolute -top-6 left-1/2 -translate-x-1/2 text-black font-medium whitespace-nowrap bg-white/80 px-2 rounded">
+                  {/* First million indicator arrow - fixed position */}
+                  {item.amount >= 1000000 && (
+                    <div className="absolute bottom-20 left-0" style={{ left: `${1000000 / RANDS_PER_PIXEL - 100}px` }}>
+                      <div className="relative">
+                        <p className="absolute -top-6 text-black font-medium whitespace-nowrap bg-white/80 px-2 py-1 rounded">
                           This is one million rand →
                         </p>
                       </div>
                     </div>
                   )}
                   
-                  {/* Ruler markings */}
-                  {[...Array(Math.floor(item.amount / 10000))].map((_, i) => (
+                  {/* Ruler markings - optimized version */}
+                  {[...Array(Math.floor(item.amount / 100000))].map((_, i) => (
                     <div key={i} className="absolute bottom-0 flex flex-col items-center"
-                         style={{ left: `${(i + 1) * (10000 / RANDS_PER_PIXEL)}px` }}>
+                         style={{ left: `${(i + 1) * (100000 / RANDS_PER_PIXEL)}px` }}>
                       <div className={`w-[1px] ${
-                        (i + 1) % 100 === 0 ? 'h-[125px] bg-black' :  // 1M marks
-                        (i + 1) % 50 === 0 ? 'h-[75px] bg-black' :    // 500K marks
-                        (i + 1) % 10 === 0 ? 'h-[50px] bg-black' :    // 100K marks
-                        'h-[15px] bg-black/40'                         // 10K marks
+                        (i + 1) % 10 === 0 ? 'h-[125px] bg-black' :  // 1M marks
+                        (i + 1) % 5 === 0 ? 'h-[75px] bg-black' :    // 500K marks
+                        'h-[50px] bg-black'                           // 100K marks
                       }`} />
-                      {(i + 1) % 100 === 0 && (
+                      {(i + 1) % 10 === 0 && (
                         <span className="absolute -top-8 text-sm text-black font-medium">
-                          {(i + 1) / 100}M
+                          {(i + 1) / 10}M
                         </span>
                       )}
-                      {(i + 1) % 10 === 0 && !((i + 1) % 100 === 0) && (
+                      {!((i + 1) % 10 === 0) && (
                         <span className="absolute -top-6 text-xs text-black/60">
-                          {((i + 1) * 10)}K
+                          {((i + 1) * 100)}K
                         </span>
                       )}
                     </div>
                   ))}
+                  
+                  {/* Background grid for smaller increments */}
+                  <div 
+                    className="absolute bottom-0 left-0 w-full h-[15px]"
+                    style={{
+                      backgroundImage: 'linear-gradient(90deg, rgba(0,0,0,0.2) 1px, transparent 1px)',
+                      backgroundSize: `${10000 / RANDS_PER_PIXEL}px 100%`,
+                    }}
+                  />
                 </div>
               )}
               
