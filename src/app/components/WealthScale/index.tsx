@@ -129,7 +129,7 @@ const WealthBlock = memo(({
         {item.amount >= 1000000 && <RulerMarks amount={item.amount} />}
         
         {/* Main label and tooltip */}
-        <div className="font-bold p-2.5 left-0 z-10 group relative">
+        <div className="font-bold p-2.5 left-0 z-10 group relative" style={{ position: 'sticky', top: '10px' }}>
           {item.label}
           <div className="text-sm">
             {formatCurrency(item.amount)}
