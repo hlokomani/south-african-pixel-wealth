@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.wealth-wrapper-outer {
+  display: inline-block;
+  overflow: visible;
+}
+
+.wealth-row {
+  display: inline-flex;
+}
+
+.title-screen {
+  width: 100vw;
+}
+
+.arrow {
+  margin-left: -6px;
+  margin-top: 5px;
+}
+
+.one-thousand {
+  width: 1px;
+  height: 1px;
+  margin-top: 5px;
+  background-color: #007A4D;
+}
+
+.wealth-title {
+  position: sticky;
+  left: 0;
+  margin-bottom: 5px;
+}
+
+.counter {
+  position: sticky;
+  left: 10px;
+  align-self: flex-end;
+  transform: translate(0, 27px);
+  color: black;
+  padding: 5px;
+  min-width: 140px;
+}
