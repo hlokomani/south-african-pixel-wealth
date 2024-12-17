@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState, memo } from 'react';
 import { createWealthData } from './data';
 import { COLORS } from './constants';
 import { WealthDataPoint } from './types';
+import { InfoBox } from './InfoBox';
 
 const RANDS_PER_PIXEL = 100;
 
@@ -81,12 +82,28 @@ RulerMarks.displayName = 'RulerMarks';
 const WealthBlock = memo(({ 
   item, 
   isFirstBlock,
-  onRef 
+  onRef,
+  currentAmount 
 }: { 
   item: WealthDataPoint;
   isFirstBlock: boolean;
   onRef: (el: HTMLDivElement | null) => void;
+  currentAmount: number;
 }) => {
+  const [showInstructions, setShowInstructions] = useState(false);
+
+  // Show scroll instructions after a delay if user hasn't scrolled
+  useEffect(() => {
+    if (isFirstBlock) {
+      const timer = setTimeout(() => {
+        if (currentAmount === 0) {
+          setShowInstructions(true);
+        }
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isFirstBlock, currentAmount]);
+
   return (
     <div 
       className="mx-12"
@@ -101,9 +118,18 @@ const WealthBlock = memo(({
           backgroundColor: COLORS.green
         }}
       >
+        {/* Scrolling amount counter */}
+        {currentAmount > 0 && (
+          <div className="fixed top-4 left-4 z-50 bg-white/80 p-3 rounded-lg shadow-lg text-2xl font-bold">
+            {formatCurrency(currentAmount)}
+          </div>
+        )}
+
+        {/* Ruler marks for amounts over 1M */}
         {item.amount >= 1000000 && <RulerMarks amount={item.amount} />}
         
-        <div className="font-bold p-2.5 left-0 z-10 group relative cursor-pointer">
+        {/* Main label and tooltip */}
+        <div className="font-bold p-2.5 left-0 z-10 group relative">
           {item.label}
           <div className="text-sm">
             {formatCurrency(item.amount)}
@@ -116,6 +142,25 @@ const WealthBlock = memo(({
             <div className="absolute -top-2 left-4 border-8 border-transparent border-b-white" />
           </div>
         </div>
+
+        {/* Impact block if available */}
+        {item.impactBlock && (
+          <InfoBox 
+            message={item.impactBlock.description}
+            threshold={item.impactBlock.cost}
+            currentAmount={currentAmount}
+          />
+        )}
+
+        {/* Scroll instructions */}
+        {isFirstBlock && showInstructions && (
+          <div className="fixed bottom-8 right-8 text-gray-400 text-lg animate-pulse">
+            <p>scroll right →</p>
+            <p className="text-sm mt-2">
+              Use shift + mousewheel or swipe sideways on touchpad
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -125,6 +170,7 @@ WealthBlock.displayName = 'WealthBlock';
 
 export const WealthScale = () => {
   const [currentAmount, setCurrentAmount] = useState<number>(0);
+  const [activeBlockIndex, setActiveBlockIndex] = useState<number>(0);
   const wealthBlockRefs = useRef<(HTMLDivElement | null)[]>([]);
   const wealthData = createWealthData()[0].data;
 
@@ -137,6 +183,7 @@ export const WealthScale = () => {
         const isVisible = rect.left < window.innerWidth && rect.right > 0;
         
         if (isVisible) {
+          setActiveBlockIndex(index);
           const scrolledPixels = window.scrollX - ref.offsetLeft;
           const amount = Math.min(
             scrolledPixels * RANDS_PER_PIXEL,
@@ -192,6 +239,7 @@ export const WealthScale = () => {
             item={item}
             isFirstBlock={index === 0}
             onRef={setRef(index)}
+            currentAmount={index === activeBlockIndex ? currentAmount : 0}
           />
         ))}
       </div>
